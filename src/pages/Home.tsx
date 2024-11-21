@@ -68,6 +68,9 @@ export function Home() {
         </div>
 
         <ul className="flex gap-2 overflow-auto px-4 no-scroll">
+          {source.type === 'LOADING' && [1, 2, 3, 4].map((i) => (
+            <li key={i} className="w-32 h-20 bg-gray-200 bg-opacity-15 animate-pulse rounded-lg"></li>
+          ))}
           {valueOrEmpty(source, []).map((item) => (
             <li key={item.id}>
               <Link
