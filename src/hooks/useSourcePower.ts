@@ -23,22 +23,29 @@ export type SourceDetails = {
 
 type Actions = {
   getDetails: (sourceId: string) => Promise<SourceDetails>;
+  toggleLight: (sourceId: string, powerId: string) => Promise<void>;
 };
 type States = {
   source: AsyncData<Source[]>;
 };
 
 export const useSourcePower = create<States & Actions>((set) => {
-  delay(200).then(() => {
-    httpClient.get<Source[]>('/sources')
-      .then(({ data }) => set({ source: { type: 'SUCCESS', data } }));
-  });
+  async function fetch() {
+    const { data } = await httpClient.get<Source[]>('/sources')
+    set({ source: { type: 'SUCCESS', data } });
+  }
+
+  delay(200).then(fetch);
 
   return {
     source: { type: 'LOADING' },
     getDetails: async (sourceId) => {
       const { data } = await httpClient.get<SourceDetails>(`/sources/${sourceId}`);
       return data;
-    }
+    },
+    toggleLight: async (sourceId, powerId) => {
+      await httpClient.patch(`/sources/${sourceId}/${powerId}`);
+      await fetch();
+    },
   };
 });

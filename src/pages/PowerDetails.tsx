@@ -8,25 +8,51 @@ import { SourceDetails, useSourcePower } from "../hooks/useSourcePower";
 import { AsyncData } from "../types/AsyncData";
 
 export function PowerDetails() {
-  const { powerSource } = useParams();
-  const { getDetails } = useSourcePower();
+  const { powerSource: sourceId } = useParams();
+  const { getDetails, toggleLight } = useSourcePower();
 
   const [data, setData] = useState<AsyncData<SourceDetails>>({
     type: 'LOADING',
   });
 
   useEffect(() => {
-    if (powerSource) {
-      getDetails(powerSource).then((data) => {
+    if (sourceId) {
+      getDetails(sourceId).then((data) => {
         setData({ type: 'SUCCESS', data });
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  function handleTogleLight(powerId: string) {
+    if (!sourceId) return;   
+
+    toggleLight(sourceId, powerId);
+    
+    // updating data in-memory
+    setData(old => {
+      if (old.type !== 'SUCCESS') return old;
+
+      return {
+        type: 'SUCCESS',
+        data: {
+          ...old.data,
+          powers: old.data.powers.map(power => {
+            if (power.id !== powerId) return power;
+
+            return {
+              ...power,
+              status: !power.status,
+            };
+          }),
+        },
+      };
+    });
+  }
+
   const powers = data.type === 'SUCCESS' ? data.data.powers : [];
 
-  if (!powerSource) return <p>Falha ao obter a Fonte de Luz</p>
+  if (!sourceId) return <p>Falha ao obter a Fonte de Luz</p>
   return (
     <div>
       <header className="flex flex-col gap-8 pl-8 md:pl-0 md:pt-8">
@@ -54,6 +80,7 @@ export function PowerDetails() {
                   'hover:bg-[#383935]  transition-opacity text-white',
                   !power.status && 'text-opacity-50'
                 )}
+                onClick={() => handleTogleLight(power.id)}
               >
                 {power.status ? 'desligar' : 'ligar'}
               </button>
