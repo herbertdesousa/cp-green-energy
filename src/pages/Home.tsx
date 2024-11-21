@@ -24,8 +24,6 @@ function usernameOrEmpty(username: AsyncData<string>): string {
   return username.type === 'SUCCESS' ? username.data : '';
 }
 
-fetch('/api').then(response => response.json()).then(console.log);
-
 export function Home() {
   const { username } = useName();
 
