@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+import { format } from "date-fns";
+
 import { AsyncData } from "../types/AsyncData";
 import { httpClient } from "../repository/HttpClient";
 import { delay } from "../utils/delay";
@@ -26,7 +28,7 @@ export function useBalance() {
             type: 'SUCCESS',
             data: {
               amount: parseCurrency(data.amount),
-              closesIn: data.closesIn,
+              closesIn: format(new Date(data.closesIn), 'dd/MM'),
             },
           });
         });

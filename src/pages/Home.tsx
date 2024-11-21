@@ -6,6 +6,7 @@ import { Button } from "../components/Button";
 import { Link } from "react-router-dom";
 import { useName } from "../hooks/useName";
 import { AsyncData } from "../types/AsyncData";
+import { useBalance } from "../hooks/useBalance";
 
 type Power = {
   id: string;
@@ -26,6 +27,7 @@ function usernameOrEmpty(username: AsyncData<string>): string {
 
 export function Home() {
   const { username } = useName();
+  const { balance } = useBalance();
 
   return (
     <>
@@ -36,26 +38,41 @@ export function Home() {
       </header>
 
       <section className="mx-auto">
-        <ProgressRing progress={10} size={290}>
-          <text
-            x="50%"
-            y="46%"
-            dominantBaseline="middle"
-            textAnchor="middle"
-            className="text-4xl font-semibold fill-current text-white"
-          >
-            R$ 55,90
-          </text>
+        <ProgressRing progress={balance.type === 'LOADING' ? 0 : 28} size={290}>
+          {balance.type === 'LOADING' && (
+            <text
+              x="50%"
+              y="50%"
+              dominantBaseline="middle"
+              textAnchor="middle"
+              className="text-4xl font-semibold fill-current text-white"
+            >
+              - - -
+            </text>
+          )}
+          {balance.type === 'SUCCESS' && (
+            <>
+              <text
+                x="50%"
+                y="46%"
+                dominantBaseline="middle"
+                textAnchor="middle"
+                className="text-4xl font-semibold fill-current text-white"
+              >
+                {balance.data.amount}
+              </text>
 
-          <text
-            x="50%"
-            y="58%"
-            dominantBaseline="middle"
-            textAnchor="middle"
-            className="text-sm font-semibold fill-current text-white text-opacity-60"
-          >
-            fecha em 15/02
-          </text>
+              <text
+                x="50%"
+                y="58%"
+                dominantBaseline="middle"
+                textAnchor="middle"
+                className="text-sm font-semibold fill-current text-white text-opacity-60"
+              >
+                fecha em {balance.data.closesIn}
+              </text>
+            </>
+          )}
         </ProgressRing>
       </section>
 
