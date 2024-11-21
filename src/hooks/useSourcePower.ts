@@ -3,7 +3,7 @@ import { AsyncData } from "../types/AsyncData";
 import { delay } from "../utils/delay";
 import { create } from "zustand";
 
-type Source = {
+export type Source = {
   id: string;
   label: string;
   activeAmount: number;
@@ -21,9 +21,15 @@ export type SourceDetails = {
   powers: Power[];
 };
 
+type CreateSource = {
+  sourceId: string;
+  label: string;
+};
+
 type Actions = {
   getDetails: (sourceId: string) => Promise<SourceDetails>;
   toggleLight: (sourceId: string, powerId: string) => Promise<void>;
+  create(source: CreateSource): Promise<void>;
 };
 type States = {
   source: AsyncData<Source[]>;
@@ -45,6 +51,12 @@ export const useSourcePower = create<States & Actions>((set) => {
     },
     toggleLight: async (sourceId, powerId) => {
       await httpClient.patch(`/sources/${sourceId}/${powerId}`);
+      await fetch();
+    },
+    create: async (source) => {
+      await httpClient.post(`/sources/${source.sourceId}`, {
+        label: source.label,
+      });
       await fetch();
     },
   };

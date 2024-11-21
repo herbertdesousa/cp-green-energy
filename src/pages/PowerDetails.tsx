@@ -6,21 +6,26 @@ import classNames from "classnames";
 import { Button } from "../components/Button";
 import { SourceDetails, useSourcePower } from "../hooks/useSourcePower";
 import { AsyncData } from "../types/AsyncData";
+import { askForLabel } from "../components/askForCreatePower";
 
 export function PowerDetails() {
   const { powerSource: sourceId } = useParams();
-  const { getDetails, toggleLight } = useSourcePower();
+  const { getDetails, toggleLight, create } = useSourcePower();
 
   const [data, setData] = useState<AsyncData<SourceDetails>>({
     type: 'LOADING',
   });
 
+  async function fetchDetails() {
+    if (!sourceId) return;
+    
+    const data = await getDetails(sourceId);
+
+    setData({ type: 'SUCCESS', data });
+  }
+
   useEffect(() => {
-    if (sourceId) {
-      getDetails(sourceId).then((data) => {
-        setData({ type: 'SUCCESS', data });
-      });
-    }
+    fetchDetails();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -50,6 +55,24 @@ export function PowerDetails() {
     });
   }
 
+  async function createPower() {
+    if (!sourceId) return;  
+   
+    while(true) {
+      const labelRes = askForLabel();
+
+      if (labelRes.type === 'ERROR') {
+        alert(labelRes.message);
+        continue;
+      }
+
+      await create({ sourceId, label: labelRes.label });
+      await fetchDetails();
+
+      break;
+    }
+  }
+
   const powers = data.type === 'SUCCESS' ? data.data.powers : [];
 
   if (!sourceId) return <p>Falha ao obter a Fonte de Luz</p>
@@ -65,7 +88,7 @@ export function PowerDetails() {
             {data.type === 'SUCCESS' ? data.data.label : ''}
           </h1>
 
-          <Button>+ Novo</Button>
+          <Button onClick={createPower}>+ Novo</Button>
         </div>
 
         <ul className="flex flex-col gap-2">

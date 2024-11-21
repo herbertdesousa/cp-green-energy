@@ -1,18 +1,47 @@
-import classNames from "classnames"
+import classNames from "classnames";
 import { MdArrowBack } from "react-icons/md";
 
-import { ProgressRing } from "../components/ProgressRing";
+import { Link, useNavigate } from "react-router-dom";
+import { askForLabel, askForSource } from "../components/askForCreatePower";
 import { Button } from "../components/Button";
-import { Link } from "react-router-dom";
-import { useName } from "../hooks/useName";
-import { valueOrEmpty } from "../types/AsyncData";
+import { ProgressRing } from "../components/ProgressRing";
 import { useBalance } from "../hooks/useBalance";
+import { useName } from "../hooks/useName";
 import { useSourcePower } from "../hooks/useSourcePower";
+import { valueOrEmpty } from "../types/AsyncData";
 
 export function Home() {
   const { username } = useName();
   const { balance } = useBalance();
-  const { source } = useSourcePower();
+  const { source, create } = useSourcePower();
+
+  const navigate = useNavigate();
+
+  const sources = valueOrEmpty(source, []);
+
+  async function handleCreate() {
+    while (true) {
+      const sourceRes = askForSource(sources);
+
+      if (sourceRes.type === 'ERROR') {
+        alert(sourceRes.message);
+        continue;
+      }
+
+      const labelRes = askForLabel();
+
+      if (labelRes.type === 'ERROR') {
+        alert(labelRes.message);
+        continue;
+      }
+
+      await create({ sourceId: sourceRes.source.id, label: labelRes.label });
+
+      navigate(`/${sourceRes.source.id}`);
+
+      break;
+    }
+  }
 
   return (
     <>
@@ -64,14 +93,14 @@ export function Home() {
       <footer className="flex flex-col gap-4">
         <div className="flex justify-between px-4">
           <h3 className="font-medium text-xl">Ativos Agora</h3>
-          <Button>+ Novo</Button>
+          {source.type === 'SUCCESS' && <Button onClick={handleCreate}>+ Novo</Button>}
         </div>
 
         <ul className="flex gap-2 overflow-auto px-4 no-scroll">
           {source.type === 'LOADING' && [1, 2, 3, 4].map((i) => (
             <li key={i} className="w-32 h-20 bg-gray-200 bg-opacity-15 animate-pulse rounded-lg"></li>
           ))}
-          {valueOrEmpty(source, []).map((item) => (
+          {sources.map((item) => (
             <li key={item.id}>
               <Link
                 to={`/${item.id}`}
