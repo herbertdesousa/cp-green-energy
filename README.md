@@ -34,5 +34,9 @@ Esta é a plataforma do Energi+, desenvolvida para que os usuários consigam ace
 - Typescript
 - React
 
+## 📊 Integração com Backend:
+Para que a plataforma funcione, foi necessário desenvolver a parte do Backend também. Por isso, criamos um repositório dedicado com toda a estrutura do backend e com o arquivo Docker, para evitar misturar com este repositório da global solution:
+- https://github.com/herbertdesousa/cp-green-energy-backend
+
 > [!Observação]
 > Ao acessar a plataforma do Energi+ pela primeira vez, devido a ter ficado um período inativo, o sistema pode entregar as informações com uma certa lentidão. Isso ocorre devido ao fato da hospedagem estar sendo feita de forma gratuita e o servidor está desligado.
