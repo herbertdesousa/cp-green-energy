@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
-import { MdArrowBack } from "react-icons/md";
-import { Link, useParams } from "react-router-dom";
 import classNames from "classnames";
+import { useEffect, useState } from "react";
+import { MdArrowBack, MdList, MdOutlineGridView } from "react-icons/md";
+import { Link, useParams } from "react-router-dom";
 
+import { askForLabel } from "../components/askForCreatePower";
 import { Button } from "../components/Button";
 import { SourceDetails, useSourcePower } from "../hooks/useSourcePower";
 import { AsyncData } from "../types/AsyncData";
-import { askForLabel } from "../components/askForCreatePower";
 
 export function PowerDetails() {
   const { powerSource: sourceId } = useParams();
@@ -77,6 +77,12 @@ function Main({ sourceId }: Props) {
 
   const powers = data.type === 'SUCCESS' ? data.data.powers : [];
 
+  const [viewMode, setViewMode] = useState<'GRID' | 'LIST'>('GRID');
+
+  function toggleViewMode() {
+    setViewMode(old => old === 'GRID' ? 'LIST' : 'GRID');
+  }
+
   return (
     <div>
       <header className="flex flex-col gap-8 pl-8 md:pl-0 md:pt-8">
@@ -92,25 +98,40 @@ function Main({ sourceId }: Props) {
           <Button onClick={createPower}>+ Novo</Button>
         </div>
 
-        <ul className="flex flex-col gap-2">
-          {powers.map(power => (
-            <li key={power.id} className="flex justify-between items-center">
-              {power.label}
+        <section className="flex flex-col">
+          <div className="ml-auto">
+            <Button className="text-white" onClick={toggleViewMode}>
+              {viewMode === 'GRID' && <MdList size={20} />}
+              {viewMode === 'LIST' && <MdOutlineGridView size={20} />}
+            </Button>
+          </div>
 
-              <button
-                type="button"
-                className={classNames(
-                  'px-4 py-1 rounded border border-white border-opacity-25',
-                  'hover:bg-[#383935]  transition-opacity text-white',
-                  !power.status && 'text-opacity-50'
-                )}
-                onClick={() => handleTogleLight(power.id)}
-              >
-                {power.status ? 'desligar' : 'ligar'}
-              </button>
-            </li>
-          ))}
-        </ul>
+          <ul
+            className={classNames(
+              "grid gap-x-4 gap-y-2",
+              viewMode === 'GRID' && 'grid-cols-2',
+              viewMode === 'LIST' && 'grid-cols-1',
+            )}
+          >
+            {powers.map(power => (
+              <li key={power.id} className="flex justify-between items-center">
+                {power.label}
+
+                <button
+                  type="button"
+                  className={classNames(
+                    'px-4 py-1 rounded border border-white border-opacity-25',
+                    'hover:bg-[#383935]  transition-opacity text-white',
+                    !power.status && 'text-opacity-50'
+                  )}
+                  onClick={() => handleTogleLight(power.id)}
+                >
+                  {power.status ? 'desligar' : 'ligar'}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
       </header>
     </div>
   );
