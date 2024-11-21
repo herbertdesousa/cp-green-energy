@@ -5,35 +5,20 @@ import { ProgressRing } from "../components/ProgressRing";
 import { Button } from "../components/Button";
 import { Link } from "react-router-dom";
 import { useName } from "../hooks/useName";
-import { AsyncData } from "../types/AsyncData";
+import { valueOrEmpty } from "../types/AsyncData";
 import { useBalance } from "../hooks/useBalance";
-
-type Power = {
-  id: string;
-  sourceId: string;
-  source: string;
-  activeAmount: number;
-};
-
-const powers: Power[] = [
-  { id: 'id-1', sourceId: 'src-1', source: 'Luzes', activeAmount: 5 },
-  { id: 'id-2', sourceId: 'src-2', source: 'Geladeira', activeAmount: 2 },
-  { id: 'id-3', sourceId: 'src-3', source: "TV's", activeAmount: 2 },
-]
-
-function usernameOrEmpty(username: AsyncData<string>): string {
-  return username.type === 'SUCCESS' ? username.data : '';
-}
+import { useSourcePower } from "../hooks/useSourcePower";
 
 export function Home() {
   const { username } = useName();
   const { balance } = useBalance();
+  const { source } = useSourcePower();
 
   return (
     <>
       <header className="px-4">
         <h1 className="text-3xl font-medium">
-          <span className="opacity-80">Olá,</span> {usernameOrEmpty(username)}
+          <span className="opacity-80">Olá,</span> {valueOrEmpty(username, '')}
         </h1>
       </header>
 
@@ -83,16 +68,16 @@ export function Home() {
         </div>
 
         <ul className="flex gap-2 overflow-auto px-4 no-scroll">
-          {powers.map((item) => (
+          {valueOrEmpty(source, []).map((item) => (
             <li key={item.id}>
               <Link
-                to={`/${item.sourceId}`}
+                to={`/${item.id}`}
                 className={classNames(
                   'flex flex-col gap-y-2',
                   'w-32 min-w-32 border-2 border-[#2E3021] rounded-lg p-2',
                 )}
               >
-                <span className="text-xs">{item.source}</span>
+                <span className="text-xs">{item.label}</span>
 
                 <div className="flex justify-between">
                   <div className="flex items-end gap-1">
