@@ -4,6 +4,8 @@ import { MdArrowBack } from "react-icons/md";
 import { ProgressRing } from "../components/ProgressRing";
 import { Button } from "../components/Button";
 import { Link } from "react-router-dom";
+import { useName } from "../hooks/useName";
+import { AsyncData } from "../types/AsyncData";
 
 type Power = {
   id: string;
@@ -18,12 +20,18 @@ const powers: Power[] = [
   { id: 'id-3', sourceId: 'src-3', source: "TV's", activeAmount: 2 },
 ]
 
+function usernameOrEmpty(username: AsyncData<string>): string {
+  return username.type === 'SUCCESS' ? username.data : '';
+}
+
 export function Home() {
+  const { username } = useName();
+
   return (
     <>
       <header className="px-4">
         <h1 className="text-3xl font-medium">
-          <span className="opacity-80">Olá,</span> Lucas
+          <span className="opacity-80">Olá,</span> {usernameOrEmpty(username)}
         </h1>
       </header>
 
@@ -67,18 +75,18 @@ export function Home() {
                   'w-32 min-w-32 border-2 border-[#2E3021] rounded-lg p-2',
                 )}
               >
-              <span className="text-xs">{item.source}</span>
+                <span className="text-xs">{item.source}</span>
 
-              <div className="flex justify-between">
-                <div className="flex items-end gap-1">
-                  <span className="text-xl">{item.activeAmount}</span>
-                  <span className="opacity-70">Ativas</span>
+                <div className="flex justify-between">
+                  <div className="flex items-end gap-1">
+                    <span className="text-xl">{item.activeAmount}</span>
+                    <span className="opacity-70">Ativas</span>
+                  </div>
+
+                  <span className="p-1 border-2 border-[#63645f] rounded-full">
+                    <MdArrowBack size={20} className="rotate-[135deg]" />
+                  </span>
                 </div>
-
-                <span className="p-1 border-2 border-[#63645f] rounded-full">
-                  <MdArrowBack size={20} className="rotate-[135deg]" />
-                </span>
-              </div>
               </Link>
             </li>
           ))}
