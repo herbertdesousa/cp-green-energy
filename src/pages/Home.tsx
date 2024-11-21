@@ -1,10 +1,10 @@
 import classNames from "classnames"
 import { MdArrowBack } from "react-icons/md";
 
-import { ProgressRing } from "./components/ProgressRing";
-import { Button } from "./components/Button";
+import { ProgressRing } from "../components/ProgressRing";
+import { Button } from "../components/Button";
 
-function App() {
+export function Home() {
   return (
     <main className="flex h-screen">
       <div
@@ -80,5 +80,3 @@ function App() {
     </main>
   )
 }
-
-export default App
