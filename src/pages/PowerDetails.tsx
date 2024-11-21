@@ -10,6 +10,14 @@ import { askForLabel } from "../components/askForCreatePower";
 
 export function PowerDetails() {
   const { powerSource: sourceId } = useParams();
+
+  if (!sourceId) return <p>Falha ao obter a Fonte de Luz</p>
+
+  return <Main sourceId={sourceId} />;
+}
+
+type Props = { sourceId: string };
+function Main({ sourceId }: Props) {
   const { getDetails, toggleLight, create } = useSourcePower();
 
   const [data, setData] = useState<AsyncData<SourceDetails>>({
@@ -17,8 +25,6 @@ export function PowerDetails() {
   });
 
   async function fetchDetails() {
-    if (!sourceId) return;
-    
     const data = await getDetails(sourceId);
 
     setData({ type: 'SUCCESS', data });
@@ -30,8 +36,6 @@ export function PowerDetails() {
   }, []);
 
   function handleTogleLight(powerId: string) {
-    if (!sourceId) return;   
-
     toggleLight(sourceId, powerId);
     
     // updating data in-memory
@@ -56,8 +60,6 @@ export function PowerDetails() {
   }
 
   async function createPower() {
-    if (!sourceId) return;  
-   
     while(true) {
       const labelRes = askForLabel();
 
@@ -75,7 +77,6 @@ export function PowerDetails() {
 
   const powers = data.type === 'SUCCESS' ? data.data.powers : [];
 
-  if (!sourceId) return <p>Falha ao obter a Fonte de Luz</p>
   return (
     <div>
       <header className="flex flex-col gap-8 pl-8 md:pl-0 md:pt-8">
