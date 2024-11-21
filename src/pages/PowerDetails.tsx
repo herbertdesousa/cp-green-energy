@@ -1,19 +1,30 @@
+import { useEffect, useState } from "react";
 import { MdArrowBack } from "react-icons/md";
 import { Link, useParams } from "react-router-dom";
-import { Button } from "../components/Button";
 import classNames from "classnames";
 
-const DATA = {
-  source: 'Luzes',
-  items: [
-    { id: 'id-1', label: 'Lâmpada 1', isOn: true },
-    { id: 'id-2', label: 'Lâmpada 2', isOn: false },
-    { id: 'id-3', label: 'Lâmpada 3', isOn: true },
-  ]
-};
+import { Button } from "../components/Button";
+import { SourceDetails, useSourcePower } from "../hooks/useSourcePower";
+import { AsyncData } from "../types/AsyncData";
 
 export function PowerDetails() {
   const { powerSource } = useParams();
+  const { getDetails } = useSourcePower();
+
+  const [data, setData] = useState<AsyncData<SourceDetails>>({
+    type: 'LOADING',
+  });
+
+  useEffect(() => {
+    if (powerSource) {
+      getDetails(powerSource).then((data) => {
+        setData({ type: 'SUCCESS', data });
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const powers = data.type === 'SUCCESS' ? data.data.powers : [];
 
   if (!powerSource) return <p>Falha ao obter a Fonte de Luz</p>
   return (
@@ -24,25 +35,27 @@ export function PowerDetails() {
         </Link>
 
         <div className="flex justify-between">
-          <h1 className="text-4xl font-medium">{DATA.source}</h1>
+          <h1 className="text-4xl font-medium">
+            {data.type === 'SUCCESS' ? data.data.label : ''}
+          </h1>
 
           <Button>+ Novo</Button>
         </div>
 
         <ul className="flex flex-col gap-2">
-          {DATA.items.map(item => (
-            <li key={item.id} className="flex justify-between items-center">
-              {item.label}
+          {powers.map(power => (
+            <li key={power.id} className="flex justify-between items-center">
+              {power.label}
 
               <button
                 type="button"
                 className={classNames(
                   'px-4 py-1 rounded border border-white border-opacity-25',
                   'hover:bg-[#383935]  transition-opacity text-white',
-                  !item.isOn && 'text-opacity-50'
+                  !power.status && 'text-opacity-50'
                 )}
               >
-                {item.isOn ? 'desligar' : 'ligar'}
+                {power.status ? 'desligar' : 'ligar'}
               </button>
             </li>
           ))}
